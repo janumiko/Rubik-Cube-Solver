@@ -2,10 +2,11 @@
 {-# HLINT ignore "Use head" #-}
 module Rotations where
 
-{- Moves assume holding that the Rubik's cube is in position where middle colors are corresponding to solved cube defined in Types.hs file -}
+{- Moves assume holding that the Rubik's cube is in position where middle colors are corresponding to solved cube defined in hs file -}
 
 import Prelude hiding (Left, Right)
-import Types
+import Types 
+import Utils
 
 {-
 moveCube :: Move -> Cube -> Cube
@@ -22,37 +23,37 @@ moveCube B' cube = moveBack' cube
 moveCube _ cube = cube
 -}
 
-moveUp :: Types.Cube -> Types.Cube
+moveUp :: Cube -> Cube
 moveUp cube = rotateTopSideClockwise $ rotateTopRowClockwise cube
 
-moveUp' :: Types.Cube -> Types.Cube
+moveUp' :: Cube -> Cube
 moveUp' cube = rotateTopRowCounterClockwise $ rotateTopSideCounterClockwise cube
 
-moveDown :: Types.Cube -> Types.Cube
+moveDown :: Cube -> Cube
 moveDown cube = rotateDownRowClockwise $ rotateDownSideClockwise cube
 
-moveDown' :: Types.Cube -> Types.Cube
+moveDown' :: Cube -> Cube
 moveDown' cube = rotateDownRowCounterClockwise $ rotateDownSideCounterClockwise cube
 
-moveLeft :: Types.Cube -> Types.Cube
+moveLeft :: Cube -> Cube
 moveLeft cube = rotateLeftSideToFront $ rotateLeftColumnToFront cube
 
-moveLeft' :: Types.Cube -> Types.Cube
+moveLeft' :: Cube -> Cube
 moveLeft' cube = rotateLeftSideToBack $ rotateLeftColumnToBack cube
 
-moveRight :: Types.Cube -> Types.Cube
+moveRight :: Cube -> Cube
 moveRight cube = rotateRightSideToBack $ rotateRightColumnToBack cube
 
-moveRight' :: Types.Cube -> Types.Cube
+moveRight' :: Cube -> Cube
 moveRight' cube = rotateRightSideToFront $ rotateRightColumnToFront cube
 
-moveFront:: Types.Cube -> Types.Cube
+moveFront:: Cube -> Cube
 moveFront cube = rotateFrontSideClockwise $ rotateFrontRowsClockwise cube
 
-moveFront' :: Types.Cube -> Types.Cube
+moveFront' :: Cube -> Cube
 moveFront' cube = rotateFrontSideCounterClockwise $ rotateFrontRowsCounterClockwise cube
 
-rotateSideClockwise :: [Types.Color] -> [Types.Color]
+rotateSideClockwise :: [Color] -> [Color]
 rotateSideClockwise side = 
   [
     side !! 6, side !! 3, side !! 0, 
@@ -60,7 +61,7 @@ rotateSideClockwise side =
     side !! 8, side !! 5, side !! 2
   ]
 
-rotateSideCounterClockwise :: [Types.Color] -> [Types.Color]
+rotateSideCounterClockwise :: [Color] -> [Color]
 rotateSideCounterClockwise side = 
   [
     side !! 2, side !! 5, side !! 8,
@@ -69,278 +70,270 @@ rotateSideCounterClockwise side =
   ]
 
 {- TOP TOP TOP TOP TOP TOP TOP TOP -}
-rotateTopSideClockwise :: Types.Cube -> Types.Cube
+rotateTopSideClockwise :: Cube -> Cube
 rotateTopSideClockwise cube = 
   [
-    (Types.Front, front), 
-    (Types.Back, back), 
-    (Types.Left, left), 
-    (Types.Right, right), 
-    (Types.Up, rotateSideClockwise up), 
-    (Types.Down, down)
+    (Front, front), 
+    (Back, back), 
+    (Left, left), 
+    (Right, right), 
+    (Up, rotateSideClockwise up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateTopSideCounterClockwise :: Types.Cube -> Types.Cube
+rotateTopSideCounterClockwise :: Cube -> Cube
 rotateTopSideCounterClockwise cube = 
   [
-    (Types.Front, front), 
-    (Types.Back, back), 
-    (Types.Left, left), 
-    (Types.Right, right), 
-    (Types.Up, rotateSideCounterClockwise up), 
-    (Types.Down, down)
+    (Front, front), 
+    (Back, back), 
+    (Left, left), 
+    (Right, right), 
+    (Up, rotateSideCounterClockwise up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateTopRowClockwise :: Types.Cube -> Types.Cube
+rotateTopRowClockwise :: Cube -> Cube
 rotateTopRowClockwise cube = 
   [
-    (Types.Front, replace3 (right !! 0, right !! 1, right !! 2) (0, 1, 2) front), 
-    (Types.Left, replace3 (front !! 0, front !! 1, front !! 2) (0, 1, 2) left), 
-    (Types.Back, replace3 (left !! 0, left !! 1, left !! 2) (0, 1, 2) back), 
-    (Types.Right, replace3 (back !! 0, back !! 1, back !! 2) (0, 1, 2) right), 
-    (Types.Up, up), 
-    (Types.Down, down)
+    (Front, replace3 (right !! 0, right !! 1, right !! 2) (0, 1, 2) front), 
+    (Left, replace3 (front !! 0, front !! 1, front !! 2) (0, 1, 2) left), 
+    (Back, replace3 (left !! 0, left !! 1, left !! 2) (0, 1, 2) back), 
+    (Right, replace3 (back !! 0, back !! 1, back !! 2) (0, 1, 2) right), 
+    (Up, up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateTopRowCounterClockwise :: Types.Cube -> Types.Cube
+rotateTopRowCounterClockwise :: Cube -> Cube
 rotateTopRowCounterClockwise cube = 
   [
-    (Types.Front, replace3 (left !! 0, left !! 1, left !! 2) (0, 1, 2) front), 
-    (Types.Right, replace3 (front !! 0, front !! 1, front !! 2) (0, 1, 2) right), 
-    (Types.Back, replace3 (right !! 0, right !! 1, right !! 2) (0, 1, 2) back), 
-    (Types.Left, replace3 (back !! 0, back !! 1, back !! 2) (0, 1, 2) left), 
-    (Types.Up, up), 
-    (Types.Down, down)
+    (Front, replace3 (left !! 0, left !! 1, left !! 2) (0, 1, 2) front), 
+    (Right, replace3 (front !! 0, front !! 1, front !! 2) (0, 1, 2) right), 
+    (Back, replace3 (right !! 0, right !! 1, right !! 2) (0, 1, 2) back), 
+    (Left, replace3 (back !! 0, back !! 1, back !! 2) (0, 1, 2) left), 
+    (Up, up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
 {- DOWN DOWN DOWN DOWN DOWN DOWN DOWN DOWN -}
-rotateDownRowClockwise :: Types.Cube -> Types.Cube
+rotateDownRowClockwise :: Cube -> Cube
 rotateDownRowClockwise cube = 
   [
-    (Types.Front, replace3 (right !! 6, right !! 7, right !! 8) (6, 7, 8) front), 
-    (Types.Left, replace3 (front !! 6, front !! 7, front !! 8) (6, 7, 8) left), 
-    (Types.Back, replace3 (left !! 6, left !! 7, left !! 8) (6, 7, 8) back), 
-    (Types.Right, replace3 (back !! 6, back !! 7, back !! 8) (6, 7, 8) right), 
-    (Types.Up, up), 
-    (Types.Down, down)
+    (Front, replace3 (right !! 6, right !! 7, right !! 8) (6, 7, 8) front), 
+    (Left, replace3 (front !! 6, front !! 7, front !! 8) (6, 7, 8) left), 
+    (Back, replace3 (left !! 6, left !! 7, left !! 8) (6, 7, 8) back), 
+    (Right, replace3 (back !! 6, back !! 7, back !! 8) (6, 7, 8) right), 
+    (Up, up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateDownRowCounterClockwise :: Types.Cube -> Types.Cube
+rotateDownRowCounterClockwise :: Cube -> Cube
 rotateDownRowCounterClockwise cube = 
   [
-    (Types.Front, replace3 (left !! 6, left !! 7, left !! 8) (6, 7, 8) front), 
-    (Types.Right, replace3 (front !! 6, front !! 7, front !! 8) (6, 7, 8) right), 
-    (Types.Back, replace3 (right !! 6, right !! 7, right !! 8) (6, 7, 8) back), 
-    (Types.Left, replace3 (back !! 6, back !! 7, back !! 8) (6, 7, 8) left), 
-    (Types.Up, up), 
-    (Types.Down, down)
+    (Front, replace3 (left !! 6, left !! 7, left !! 8) (6, 7, 8) front), 
+    (Right, replace3 (front !! 6, front !! 7, front !! 8) (6, 7, 8) right), 
+    (Back, replace3 (right !! 6, right !! 7, right !! 8) (6, 7, 8) back), 
+    (Left, replace3 (back !! 6, back !! 7, back !! 8) (6, 7, 8) left), 
+    (Up, up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateDownSideClockwise :: Types.Cube -> Types.Cube
+rotateDownSideClockwise :: Cube -> Cube
 rotateDownSideClockwise cube = 
   [
-    (Types.Front, front), 
-    (Types.Back, back), 
-    (Types.Left, left), 
-    (Types.Right, right), 
-    (Types.Up, up), 
-    (Types.Down, rotateSideClockwise down)
+    (Front, front), 
+    (Back, back), 
+    (Left, left), 
+    (Right, right), 
+    (Up, up), 
+    (Down, rotateSideClockwise down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateDownSideCounterClockwise :: Types.Cube -> Types.Cube
+rotateDownSideCounterClockwise :: Cube -> Cube
 rotateDownSideCounterClockwise cube = 
   [
-    (Types.Front, front), 
-    (Types.Back, back), 
-    (Types.Left, left), 
-    (Types.Right, right), 
-    (Types.Up, up), 
-    (Types.Down, rotateSideCounterClockwise down)
+    (Front, front), 
+    (Back, back), 
+    (Left, left), 
+    (Right, right), 
+    (Up, up), 
+    (Down, rotateSideCounterClockwise down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
 
 {- LEFT LEFT LEFT LEFT LEFT LEFT -}
 
-rotateLeftColumnToFront :: Types.Cube -> Types.Cube
+rotateLeftColumnToFront :: Cube -> Cube
 rotateLeftColumnToFront cube = 
   [
-    (Types.Front, replace3 (up !! 0, up !! 3, up !! 6) (0, 3, 6) front), 
-    (Types.Right, right),
-    (Types.Back, replace3 (down !! 6, down !! 3, down !! 0) (2, 5, 8) back), 
-    (Types.Left, left),
-    (Types.Up, replace3 (back !! 8, back !! 5, back !! 2) (0, 3, 6) up), 
-    (Types.Down, replace3 (front !! 0, front !! 3, front !! 6) (0, 3, 6) down)
+    (Front, replace3 (up !! 0, up !! 3, up !! 6) (0, 3, 6) front), 
+    (Right, right),
+    (Back, replace3 (down !! 6, down !! 3, down !! 0) (2, 5, 8) back), 
+    (Left, left),
+    (Up, replace3 (back !! 8, back !! 5, back !! 2) (0, 3, 6) up), 
+    (Down, replace3 (front !! 0, front !! 3, front !! 6) (0, 3, 6) down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube  
+    (front, left, back, right, up, down) = getSides cube  
 
-rotateLeftColumnToBack :: Types.Cube -> Types.Cube
+rotateLeftColumnToBack :: Cube -> Cube
 rotateLeftColumnToBack cube = 
   [
-    (Types.Front, replace3 (down !! 0, down !! 3, down !! 6) (0, 3, 6) front), 
-    (Types.Right, right),
-    (Types.Back, replace3 (up !! 6, up !! 3, up !! 0) (2, 5, 8) back), 
-    (Types.Left, left),
-    (Types.Up, replace3 (front !! 0, front !! 3, front !! 6) (0, 3, 6) up), 
-    (Types.Down, replace3 (back !! 8, back !! 5, back !! 2) (0, 3, 6) down)
+    (Front, replace3 (down !! 0, down !! 3, down !! 6) (0, 3, 6) front), 
+    (Right, right),
+    (Back, replace3 (up !! 6, up !! 3, up !! 0) (2, 5, 8) back), 
+    (Left, left),
+    (Up, replace3 (front !! 0, front !! 3, front !! 6) (0, 3, 6) up), 
+    (Down, replace3 (back !! 8, back !! 5, back !! 2) (0, 3, 6) down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateLeftSideToFront :: Types.Cube -> Types.Cube
+rotateLeftSideToFront :: Cube -> Cube
 rotateLeftSideToFront cube = 
   [
-    (Types.Front, front), 
-    (Types.Back, back), 
-    (Types.Left, rotateSideClockwise left), 
-    (Types.Right, right), 
-    (Types.Up, up), 
-    (Types.Down, down)
+    (Front, front), 
+    (Back, back), 
+    (Left, rotateSideClockwise left), 
+    (Right, right), 
+    (Up, up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateLeftSideToBack :: Types.Cube -> Types.Cube
+rotateLeftSideToBack :: Cube -> Cube
 rotateLeftSideToBack cube = 
   [
-    (Types.Front, front), 
-    (Types.Back, back), 
-    (Types.Left, rotateSideCounterClockwise left), 
-    (Types.Right, right), 
-    (Types.Up, up), 
-    (Types.Down, down)
+    (Front, front), 
+    (Back, back), 
+    (Left, rotateSideCounterClockwise left), 
+    (Right, right), 
+    (Up, up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
 {- RIGHT RIGHT RIGHT RIGHT RIGHT RIGHT RIGHT -}
 
-rotateRightColumnToFront :: Types.Cube -> Types.Cube
+rotateRightColumnToFront :: Cube -> Cube
 rotateRightColumnToFront cube = 
   [
-    (Types.Front, replace3 (up !! 2, up !! 5, up !! 8) (2, 5, 8) front), 
-    (Types.Right, right),
-    (Types.Back, replace3 (down !! 8, down !! 5, down !! 2) (0, 3, 6) back), 
-    (Types.Left, left),
-    (Types.Up, replace3 (back !! 6, back !! 3, back !! 0) (2, 5, 8) up), 
-    (Types.Down, replace3 (front !! 2, front !! 5, front !! 8) (2, 5, 8) down)
+    (Front, replace3 (up !! 2, up !! 5, up !! 8) (2, 5, 8) front), 
+    (Right, right),
+    (Back, replace3 (down !! 8, down !! 5, down !! 2) (0, 3, 6) back), 
+    (Left, left),
+    (Up, replace3 (back !! 6, back !! 3, back !! 0) (2, 5, 8) up), 
+    (Down, replace3 (front !! 2, front !! 5, front !! 8) (2, 5, 8) down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube  
+    (front, left, back, right, up, down) = getSides cube  
 
-rotateRightColumnToBack :: Types.Cube -> Types.Cube
+rotateRightColumnToBack :: Cube -> Cube
 rotateRightColumnToBack cube = 
   [
-    (Types.Front, replace3 (down !! 2, down !! 5, down !! 8) (2, 5, 8) front), 
-    (Types.Right, right),
-    (Types.Back, replace3 (up !! 8, up !! 5, up !! 2) (0, 3, 6) back), 
-    (Types.Left, left),
-    (Types.Up, replace3 (front !! 2, front !! 5, front !! 8) (2, 5, 8) up), 
-    (Types.Down, replace3 (back !! 6, back !! 3, back !! 0) (2, 5, 8) down)
+    (Front, replace3 (down !! 2, down !! 5, down !! 8) (2, 5, 8) front), 
+    (Right, right),
+    (Back, replace3 (up !! 8, up !! 5, up !! 2) (0, 3, 6) back), 
+    (Left, left),
+    (Up, replace3 (front !! 2, front !! 5, front !! 8) (2, 5, 8) up), 
+    (Down, replace3 (back !! 6, back !! 3, back !! 0) (2, 5, 8) down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateRightSideToFront :: Types.Cube -> Types.Cube
+rotateRightSideToFront :: Cube -> Cube
 rotateRightSideToFront cube = 
   [
-    (Types.Front, front), 
-    (Types.Back, back), 
-    (Types.Left, left), 
-    (Types.Right, rotateSideCounterClockwise right), 
-    (Types.Up, up), 
-    (Types.Down, down)
+    (Front, front), 
+    (Back, back), 
+    (Left, left), 
+    (Right, rotateSideCounterClockwise right), 
+    (Up, up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateRightSideToBack :: Types.Cube -> Types.Cube
+rotateRightSideToBack :: Cube -> Cube
 rotateRightSideToBack cube = 
   [
-    (Types.Front, front), 
-    (Types.Back, back), 
-    (Types.Left, left), 
-    (Types.Right, rotateSideClockwise right), 
-    (Types.Up, up), 
-    (Types.Down, down)
+    (Front, front), 
+    (Back, back), 
+    (Left, left), 
+    (Right, rotateSideClockwise right), 
+    (Up, up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
 {- FRONT FRONT FRONT FRONT FRONT FRONT -}
 
-rotateFrontRowsClockwise :: Types.Cube -> Types.Cube
+rotateFrontRowsClockwise :: Cube -> Cube
 rotateFrontRowsClockwise cube = 
   [
-    (Types.Front, front), 
-    (Types.Right, replace3 (up !! 6, up !! 7, up !! 8) (0, 3, 6) right),
-    (Types.Back, back), 
-    (Types.Left, replace3 (down !! 0, down !! 1, down !! 2) (2, 5, 8) left),
-    (Types.Up, replace3 (left !! 2, left !! 5, left !! 6) (6, 7, 8) up), 
-    (Types.Down, replace3 (right !! 6, right !! 3, right !! 0) (0, 1, 2) down)
+    (Front, front), 
+    (Right, replace3 (up !! 6, up !! 7, up !! 8) (0, 3, 6) right),
+    (Back, back), 
+    (Left, replace3 (down !! 0, down !! 1, down !! 2) (2, 5, 8) left),
+    (Up, replace3 (left !! 2, left !! 5, left !! 6) (6, 7, 8) up), 
+    (Down, replace3 (right !! 6, right !! 3, right !! 0) (0, 1, 2) down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube  
+    (front, left, back, right, up, down) = getSides cube  
 
-rotateFrontRowsCounterClockwise :: Types.Cube -> Types.Cube
+rotateFrontRowsCounterClockwise :: Cube -> Cube
 rotateFrontRowsCounterClockwise cube = 
   [
-    (Types.Front, front), 
-    (Types.Right, replace3 (down !! 2, down !! 1, down !! 0) (0, 3, 6) right),
-    (Types.Back, back), 
-    (Types.Left, replace3 (up !! 8, up !! 7, up !! 6) (2, 5, 8) left),
-    (Types.Up, replace3 (right !! 0, right !! 3, right !! 6) (6, 7, 8) up), 
-    (Types.Down, replace3 (left !! 2, left !! 5, left !! 8) (0, 1, 2) down)
+    (Front, front), 
+    (Right, replace3 (down !! 2, down !! 1, down !! 0) (0, 3, 6) right),
+    (Back, back), 
+    (Left, replace3 (up !! 8, up !! 7, up !! 6) (2, 5, 8) left),
+    (Up, replace3 (right !! 0, right !! 3, right !! 6) (6, 7, 8) up), 
+    (Down, replace3 (left !! 2, left !! 5, left !! 8) (0, 1, 2) down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateFrontSideClockwise :: Types.Cube -> Types.Cube
+rotateFrontSideClockwise :: Cube -> Cube
 rotateFrontSideClockwise cube = 
   [
-    (Types.Front, rotateSideClockwise front), 
-    (Types.Back, back), 
-    (Types.Left, left), 
-    (Types.Right,  right), 
-    (Types.Up, up), 
-    (Types.Down, down)
+    (Front, rotateSideClockwise front), 
+    (Back, back), 
+    (Left, left), 
+    (Right,  right), 
+    (Up, up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
+    (front, left, back, right, up, down) = getSides cube
 
-rotateFrontSideCounterClockwise :: Types.Cube -> Types.Cube
+rotateFrontSideCounterClockwise :: Cube -> Cube
 rotateFrontSideCounterClockwise cube = 
   [
-    (Types.Front, rotateSideCounterClockwise front), 
-    (Types.Back, back), 
-    (Types.Left, left), 
-    (Types.Right, right), 
-    (Types.Up, up), 
-    (Types.Down, down)
+    (Front, rotateSideCounterClockwise front), 
+    (Back, back), 
+    (Left, left), 
+    (Right, right), 
+    (Up, up), 
+    (Down, down)
   ]
   where
-    (front, left, back, right, up, down) = Types.getSides cube
-
-
-replace3 :: (a, a, a) -> (Int, Int, Int) -> [a] -> [a]
-replace3 (v1, v2, v3) (t1, t2, t3) target = replace v3 t3 (replace v2 t2 (replace v1 t1 target))
-
-replace :: a -> Int -> [a] -> [a]
-replace _ _ [] = []
-replace value n (x:xs) = if n == 0 then value : xs else x : replace value (n - 1) xs
+    (front, left, back, right, up, down) = getSides cube
