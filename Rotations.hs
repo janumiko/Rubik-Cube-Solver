@@ -53,6 +53,13 @@ moveFront cube = rotateFrontSideClockwise $ rotateFrontRowsClockwise cube
 moveFront' :: Cube -> Cube
 moveFront' cube = rotateFrontSideCounterClockwise $ rotateFrontRowsCounterClockwise cube
 
+moveBack :: Cube -> Cube
+moveBack cube = rotateBackRowsCounterClockwise $ rotateBackRowsCounterClockwise cube
+
+moveBack' :: Cube -> Cube
+moveBack' cube = rotateBackRowsClockwise $ rotateBackRowsClockwise cube
+
+
 rotateSideClockwise :: [Color] -> [Color]
 rotateSideClockwise side = 
   [
@@ -330,6 +337,60 @@ rotateFrontSideCounterClockwise cube =
   [
     (Front, rotateSideCounterClockwise front), 
     (Back, back), 
+    (Left, left), 
+    (Right, right), 
+    (Up, up), 
+    (Down, down)
+  ]
+  where
+    (front, left, back, right, up, down) = getSides cube
+
+{- BACK BACK BACK BACK BACK BACK -}
+
+rotateBackRowsClockwise :: Cube -> Cube
+rotateBackRowsClockwise cube = 
+  [
+    (Front, front), 
+    (Right, replace3 (down !! 8, down !! 7, down !! 6) (2, 5, 8) right),
+    (Back, back), 
+    (Left, replace3 (up !! 2, up !! 1, up !! 0) (0, 3, 6) left),
+    (Up, replace3 (right !! 2, right !! 5, right !! 8) (0, 1, 2) up), 
+    (Down, replace3 (left !! 0, left !! 3, left !! 6) (6, 7, 8) down)
+  ]
+  where
+    (front, left, back, right, up, down) = getSides cube  
+
+rotateBackRowsCounterClockwise :: Cube -> Cube
+rotateBackRowsCounterClockwise cube = 
+  [
+    (Front, front), 
+    (Right, replace3 (up !! 0, up !! 1, up !! 2) (2, 5, 8) right),
+    (Back, back), 
+    (Left, replace3 (down !! 6, down !! 7, down !! 8) (0, 3, 6) left),
+    (Up, replace3 (left !! 6, left !! 3, left !! 0) (0, 1, 2) up), 
+    (Down, replace3 (right !! 8, right !! 5, right !! 2) (6, 7, 8) down)
+  ]
+  where
+    (front, left, back, right, up, down) = getSides cube
+
+rotateBackSideClockwise :: Cube -> Cube
+rotateBackSideClockwise cube = 
+  [
+    (Front, front), 
+    (Back, rotateSideClockwise back), 
+    (Left, left), 
+    (Right, right), 
+    (Up, up), 
+    (Down, down)
+  ]
+  where
+    (front, left, back, right, up, down) = getSides cube
+
+rotateBackSideCounterClockwise :: Cube -> Cube
+rotateBackSideCounterClockwise cube = 
+  [
+    (Front, front), 
+    (Back, rotateSideCounterClockwise back), 
     (Left, left), 
     (Right, right), 
     (Up, up), 
