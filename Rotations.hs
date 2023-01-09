@@ -8,7 +8,6 @@ import Prelude hiding (Left, Right)
 import Types 
 import Utils
 
-{-
 moveCube :: Move -> Cube -> Cube
 moveCube U  cube = moveUp cube
 moveCube U' cube = moveUp' cube
@@ -21,7 +20,6 @@ moveCube R' cube = moveRight' cube
 moveCube B  cube = moveBack cube
 moveCube B' cube = moveBack' cube
 moveCube _ cube = cube
--}
 
 moveUp :: Cube -> Cube
 moveUp cube = rotateTopSideClockwise $ rotateTopRowClockwise cube
