@@ -2,6 +2,8 @@
 {-# HLINT ignore "Use head" #-}
 module Rotations where
 
+{- Moves assume holding that the Rubik's cube is in position where middle colors are corresponding to solved cube defined in Types.hs file -}
+
 import Prelude hiding (Left, Right)
 import Types
 
@@ -43,6 +45,12 @@ moveRight cube = rotateRightSideToBack $ rotateRightColumnToBack cube
 
 moveRight' :: Types.Cube -> Types.Cube
 moveRight' cube = rotateRightSideToFront $ rotateRightColumnToFront cube
+
+moveFront:: Types.Cube -> Types.Cube
+moveFront cube = rotateFrontSideClockwise $ rotateFrontRowsClockwise cube
+
+moveFront' :: Types.Cube -> Types.Cube
+moveFront' cube = rotateFrontSideCounterClockwise $ rotateFrontRowsCounterClockwise cube
 
 rotateSideClockwise :: [Types.Color] -> [Types.Color]
 rotateSideClockwise side = 
@@ -274,6 +282,61 @@ rotateRightSideToBack cube =
   ]
   where
     (front, left, back, right, up, down) = Types.getSides cube
+
+{- FRONT FRONT FRONT FRONT FRONT FRONT -}
+
+rotateFrontRowsClockwise :: Types.Cube -> Types.Cube
+rotateFrontRowsClockwise cube = 
+  [
+    (Types.Front, front), 
+    (Types.Right, replace3 (up !! 6, up !! 7, up !! 8) (0, 3, 6) right),
+    (Types.Back, back), 
+    (Types.Left, replace3 (down !! 0, down !! 1, down !! 2) (2, 5, 8) left),
+    (Types.Up, replace3 (left !! 2, left !! 5, left !! 6) (6, 7, 8) up), 
+    (Types.Down, replace3 (right !! 6, right !! 3, right !! 0) (0, 1, 2) down)
+  ]
+  where
+    (front, left, back, right, up, down) = Types.getSides cube  
+
+rotateFrontRowsCounterClockwise :: Types.Cube -> Types.Cube
+rotateFrontRowsCounterClockwise cube = 
+  [
+    (Types.Front, front), 
+    (Types.Right, replace3 (down !! 2, down !! 1, down !! 0) (0, 3, 6) right),
+    (Types.Back, back), 
+    (Types.Left, replace3 (up !! 8, up !! 7, up !! 6) (2, 5, 8) left),
+    (Types.Up, replace3 (right !! 0, right !! 3, right !! 6) (6, 7, 8) up), 
+    (Types.Down, replace3 (left !! 2, left !! 5, left !! 8) (0, 1, 2) down)
+  ]
+  where
+    (front, left, back, right, up, down) = Types.getSides cube
+
+rotateFrontSideClockwise :: Types.Cube -> Types.Cube
+rotateFrontSideClockwise cube = 
+  [
+    (Types.Front, rotateSideClockwise front), 
+    (Types.Back, back), 
+    (Types.Left, left), 
+    (Types.Right,  right), 
+    (Types.Up, up), 
+    (Types.Down, down)
+  ]
+  where
+    (front, left, back, right, up, down) = Types.getSides cube
+
+rotateFrontSideCounterClockwise :: Types.Cube -> Types.Cube
+rotateFrontSideCounterClockwise cube = 
+  [
+    (Types.Front, rotateSideCounterClockwise front), 
+    (Types.Back, back), 
+    (Types.Left, left), 
+    (Types.Right, right), 
+    (Types.Up, up), 
+    (Types.Down, down)
+  ]
+  where
+    (front, left, back, right, up, down) = Types.getSides cube
+
 
 replace3 :: (a, a, a) -> (Int, Int, Int) -> [a] -> [a]
 replace3 (v1, v2, v3) (t1, t2, t3) target = replace v3 t3 (replace v2 t2 (replace v1 t1 target))
