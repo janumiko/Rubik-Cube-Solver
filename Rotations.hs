@@ -2,8 +2,6 @@
 {-# HLINT ignore "Use head" #-}
 module Rotations where
 
-{- Moves assume holding that the Rubik's cube is in position where middle colors are corresponding to solved cube defined in hs file -}
-
 import Prelude hiding (Left, Right)
 import Types 
 import Utils
