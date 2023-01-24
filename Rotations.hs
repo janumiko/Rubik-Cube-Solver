@@ -8,7 +8,7 @@ import Utils
 import Prelude hiding (Left, Right)
 
 makeMoves :: [Move] -> Cube -> Cube
-makeMoves moves cube = foldl (\cube move -> moveCube move cube) cube moves
+makeMoves moves cube = foldl (flip moveCube) cube moves
 
 moveCube :: Move -> Cube -> Cube
 moveCube U cube = moveUp cube

@@ -2,45 +2,38 @@ import Rotations
 import Solving
 import Types
 import Utils
+import Prelude hiding (Left, Right)
 
 testCube =
   [ (Front, [Orange, Orange, Orange, Orange, Orange, Orange, Orange, Orange, Orange]),
     (Right, [Blue, Blue, Blue, Blue, Blue, Blue, Blue, Blue, Blue]),
     (Back, [Red, Red, Red, Red, Red, Red, Red, Red, Red]),
     (Left, [Green, Green, Green, Green, Green, Green, Green, Green, Green]),
-    (Down, [White, White, White, White, White, White, White, White, White]),
-    (Up, [Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow])
-  ]
+    (Up, [Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow]),
+    (Down, [White, White, White, White, White, White, White, White, White])
+  ] ::
+    Cube
+
+testMakeMoves :: Bool
+testMakeMoves = makeMoves [F, F', D, D', U, U', L, L', R, R', B, B'] testCube == testCube
 
 testUpUp :: Bool
-testUpUp = do
-  moveUp moveUp' testCube == testCube
-  moveUp' moveUp testCube == testCube
+testUpUp = moveUp' (moveUp testCube) == testCube && moveUp (moveUp' testCube) == testCube
 
 testDownDown :: Bool
-testDownDown = do
-  moveDown moveDown' testCube == testCube
-  moveDown' moveDown testCube == testCube
+testDownDown = moveDown (moveDown' testCube) == testCube && moveDown' (moveDown testCube) == testCube
 
 testLeftLeft :: Bool
-testLeftLeft = do
-  moveLeft moveLeft' testCube == testCube
-  moveLeft' moveLeft testCube == testCube
+testLeftLeft = moveLeft (moveLeft' testCube) == testCube && moveLeft' (moveLeft testCube) == testCube
 
 testRightRight :: Bool
-testRightRight = do
-  moveRight moveRight' testCube == testCube
-  moveRight' moveRight testCube == testCube
+testRightRight = moveRight (moveRight' testCube) == testCube && moveRight' (moveRight testCube) == testCube
 
-testDownDown :: Bool
-testDownDown = do
-  moveDown moveDown' testCube == testCube
-  moveDown' moveDown testCube == testCube
+testFrontFront :: Bool
+testFrontFront = moveFront (moveFront' testCube) == testCube && moveFront' (moveFront testCube) == testCube
 
 testBackBack :: Bool
-testBackBack = do
-  moveBack moveBack' testCube == testCube
-  moveBack' moveBack testCube == testCube
+testBackBack = moveBack (moveBack' testCube) == testCube && moveBack' (moveBack testCube) == testCube
 
 testUp :: Bool
 testUp =
@@ -219,3 +212,4 @@ testAll =
     && testUpUp
     && testFrontFront
     && testBackBack
+    && testMakeMoves
