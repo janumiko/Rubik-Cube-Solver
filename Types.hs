@@ -13,3 +13,5 @@ type Face = (Side, [Color])
 type Cube = [Face]
 
 data Move = U | U' | D | D' | L | L' | R | R' | F | F' | B | B' deriving (Eq, Show)
+
+type CubeWithMoves = (Cube, [Move])

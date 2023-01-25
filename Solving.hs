@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use head" #-}
 module Solving where
 
 import Debug.Trace
@@ -6,7 +8,10 @@ import Types
 import Utils
 import Prelude hiding (Left, Right)
 
-makeMoveAndNoteWhiteUp :: Side -> [Move] -> (Cube, [Move]) -> (Cube, [Move])
+solveCube :: Cube -> CubeWithMoves
+solveCube cube = solveWhiteCorners $ solveWhiteCross (cube, [])
+
+makeMoveAndNoteWhiteUp :: Side -> [Move] -> CubeWithMoves -> CubeWithMoves
 makeMoveAndNoteWhiteUp side moves (cube, past_moves) =
   trace
     ("DEBUG" ++ show moves ++ show side)
@@ -14,16 +19,17 @@ makeMoveAndNoteWhiteUp side moves (cube, past_moves) =
   where
     translated_moves = translateMovesWhiteUp side moves
 
-makeMoveAndNoteWhiteDown :: Side -> [Move] -> (Cube, [Move]) -> (Cube, [Move])
+makeMoveAndNoteWhiteDown :: Side -> [Move] -> CubeWithMoves -> CubeWithMoves
 makeMoveAndNoteWhiteDown side moves (cube, past_moves) =
   (makeMoves translated_moves cube, past_moves ++ translated_moves)
   where
     translated_moves = translateMovesWhiteDown side moves
 
-{-- First step, solve white cross --}
+{-- Phase 1
+solve white cross --}
 
-solveWhiteCross :: (Cube, [Move]) -> (Cube, [Move])
-solveWhiteCross cube = if checkCrossAndSides (fst cube) then cube else solveWhiteCross $ fixUpEdges cube
+solveWhiteCross :: CubeWithMoves -> CubeWithMoves
+solveWhiteCross cube = if checkCrossAndSides (fst cube) then cube else solveWhiteCross $ fixUpSides cube
 
 checkCross :: Cube -> Side -> Bool
 checkCross cube side =
@@ -36,98 +42,275 @@ checkCross cube side =
 
 checkCrossAndSides :: Cube -> Bool
 checkCrossAndSides cube =
-  ( front !! 1 == getTargetSideColor Front
-      && right !! 1 == getTargetSideColor Right
-      && left !! 1 == getTargetSideColor Left
-      && back !! 1 == getTargetSideColor Back
+  ( front !! 1 == Red
+      && right !! 1 == Blue
+      && left !! 1 == Green
+      && back !! 1 == Orange
   )
     && checkCross cube Up
   where
     (front, left, back, right, up, down) = getSides cube
 
-fixUpEdges :: (Cube, [Move]) -> (Cube, [Move])
-fixUpEdges cube = fixBackUpEdges $ fixLeftUpEdges $ fixRightUpEdges $ fixFrontUpEdges cube
+fixUpSides :: CubeWithMoves -> CubeWithMoves
+fixUpSides cube = fixBackUpSides $ fixLeftUpSides $ fixRightUpSides $ fixFrontUpSides cube
 
-fixFrontUpEdges :: (Cube, [Move]) -> (Cube, [Move])
-fixFrontUpEdges cube
-  | front !! 1 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixFrontUpEdges $ fixFrontWhiteSideBottom $ makeMoveAndNoteWhiteUp Front [F, F] cube
-  | front !! 3 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixFrontUpEdges $ fixFrontWhiteSideBottom $ makeMoveAndNoteWhiteUp Front [F'] cube
-  | front !! 5 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixFrontUpEdges $ fixFrontWhiteSideBottom $ makeMoveAndNoteWhiteUp Front [F] cube
-  | front !! 7 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixFrontUpEdges $ fixFrontWhiteSideBottom cube
-  | getSide Down (fst cube) !! 1 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixFrontUpEdges $ fixFrontWhiteDown cube
+fixFrontUpSides :: CubeWithMoves -> CubeWithMoves
+fixFrontUpSides cube
+  | front !! 1 == White = trace ("DEBUG" ++ show cube) $ fixFrontUpSides $ fixFrontWhiteSideDown $ makeMoveAndNoteWhiteUp Front [F, F] cube
+  | front !! 3 == White = trace ("DEBUG" ++ show cube) $ fixFrontUpSides $ fixFrontWhiteSideDown $ makeMoveAndNoteWhiteUp Front [F'] cube
+  | front !! 5 == White = trace ("DEBUG" ++ show cube) $ fixFrontUpSides $ fixFrontWhiteSideDown $ makeMoveAndNoteWhiteUp Front [F] cube
+  | front !! 7 == White = trace ("DEBUG" ++ show cube) $ fixFrontUpSides $ fixFrontWhiteSideDown cube
+  | down !! 1 == White  = trace ("DEBUG" ++ show cube) $ fixFrontUpSides $ fixFrontWhiteDown cube
   | otherwise = cube
   where
     front = getSide Front (fst cube)
+    down = getSide Down (fst cube)
 
-fixRightUpEdges :: (Cube, [Move]) -> (Cube, [Move])
-fixRightUpEdges cube
-  | right !! 1 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixRightUpEdges $ fixRightWhiteSideBottom $ makeMoveAndNoteWhiteUp Right [F, F] cube
-  | right !! 3 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixRightUpEdges $ fixRightWhiteSideBottom $ makeMoveAndNoteWhiteUp Right [F'] cube
-  | right !! 5 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixRightUpEdges $ fixRightWhiteSideBottom $ makeMoveAndNoteWhiteUp Right [F] cube
-  | right !! 7 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixRightUpEdges $ fixRightWhiteSideBottom cube
-  | getSide Down (fst cube) !! 5 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixRightUpEdges $ fixRightWhiteDown cube
+fixRightUpSides :: CubeWithMoves -> CubeWithMoves
+fixRightUpSides cube
+  | right !! 1 == White = trace ("DEBUG" ++ show cube) $ fixRightUpSides $ fixRightWhiteSideDown $ makeMoveAndNoteWhiteUp Right [F, F] cube
+  | right !! 3 == White = trace ("DEBUG" ++ show cube) $ fixRightUpSides $ fixRightWhiteSideDown $ makeMoveAndNoteWhiteUp Right [F'] cube
+  | right !! 5 == White = trace ("DEBUG" ++ show cube) $ fixRightUpSides $ fixRightWhiteSideDown $ makeMoveAndNoteWhiteUp Right [F] cube
+  | right !! 7 == White = trace ("DEBUG" ++ show cube) $ fixRightUpSides $ fixRightWhiteSideDown cube
+  | down !! 5 == White  = trace ("DEBUG" ++ show cube) $ fixRightUpSides $ fixRightWhiteDown cube
   | otherwise = cube
   where
     right = getSide Right (fst cube)
+    down = getSide Down (fst cube)
 
-fixLeftUpEdges :: (Cube, [Move]) -> (Cube, [Move])
-fixLeftUpEdges cube
-  | left !! 1 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixLeftUpEdges $ fixLeftWhiteSideBottom $ makeMoveAndNoteWhiteUp Left [F, F] cube
-  | left !! 3 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixLeftUpEdges $ fixLeftWhiteSideBottom $ makeMoveAndNoteWhiteUp Left [F'] cube
-  | left !! 5 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixLeftUpEdges $ fixLeftWhiteSideBottom $ makeMoveAndNoteWhiteUp Left [F] cube
-  | left !! 7 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixLeftUpEdges $ fixLeftWhiteSideBottom cube
-  | getSide Down (fst cube) !! 3 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixLeftUpEdges $ fixLeftWhiteDown cube
+fixLeftUpSides :: CubeWithMoves -> CubeWithMoves
+fixLeftUpSides cube
+  | left !! 1 == White = trace ("DEBUG" ++ show cube) $ fixLeftUpSides $ fixLeftWhiteSideDown $ makeMoveAndNoteWhiteUp Left [F, F] cube
+  | left !! 3 == White = trace ("DEBUG" ++ show cube) $ fixLeftUpSides $ fixLeftWhiteSideDown $ makeMoveAndNoteWhiteUp Left [F'] cube
+  | left !! 5 == White = trace ("DEBUG" ++ show cube) $ fixLeftUpSides $ fixLeftWhiteSideDown $ makeMoveAndNoteWhiteUp Left [F] cube
+  | left !! 7 == White = trace ("DEBUG" ++ show cube) $ fixLeftUpSides $ fixLeftWhiteSideDown cube
+  | down !! 3 == White = trace ("DEBUG" ++ show cube) $ fixLeftUpSides $ fixLeftWhiteDown cube
   | otherwise = cube
   where
     left = getSide Left (fst cube)
+    down = getSide Down (fst cube)
 
-fixBackUpEdges :: (Cube, [Move]) -> (Cube, [Move])
-fixBackUpEdges cube
-  | back !! 1 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixBackUpEdges $ fixBackWhiteSideBottom $ makeMoveAndNoteWhiteUp Back [F, F] cube
-  | back !! 3 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixBackUpEdges $ fixBackWhiteSideBottom $ makeMoveAndNoteWhiteUp Back [F'] cube
-  | back !! 5 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixBackUpEdges $ fixBackWhiteSideBottom $ makeMoveAndNoteWhiteUp Back [F] cube
-  | back !! 7 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixBackUpEdges $ fixBackWhiteSideBottom cube
-  | getSide Down (fst cube) !! 7 == getTargetSideColor Up = trace ("DEBUG" ++ show cube) $ fixBackUpEdges $ fixBackWhiteDown cube
+fixBackUpSides :: CubeWithMoves -> CubeWithMoves
+fixBackUpSides cube
+  | back !! 1 == White = trace ("DEBUG" ++ show cube) $ fixBackUpSides $ fixBackWhiteSideDown $ makeMoveAndNoteWhiteUp Back [F, F] cube
+  | back !! 3 == White = trace ("DEBUG" ++ show cube) $ fixBackUpSides $ fixBackWhiteSideDown $ makeMoveAndNoteWhiteUp Back [F'] cube
+  | back !! 5 == White = trace ("DEBUG" ++ show cube) $ fixBackUpSides $ fixBackWhiteSideDown $ makeMoveAndNoteWhiteUp Back [F] cube
+  | back !! 7 == White = trace ("DEBUG" ++ show cube) $ fixBackUpSides $ fixBackWhiteSideDown cube
+  | down !! 7 == White = trace ("DEBUG" ++ show cube) $ fixBackUpSides $ fixBackWhiteDown cube
   | otherwise = cube
   where
     back = getSide Back (fst cube)
+    down = getSide Down (fst cube)
 
-fixFrontWhiteSideBottom :: (Cube, [Move]) -> (Cube, [Move])
-fixFrontWhiteSideBottom cube
-  | getSide Down (fst cube) !! 1 == getTargetSideColor Front = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Front [D', L', F, L] cube
-  | otherwise = trace ("DEBUG fixFrontWhiteSideBottom" ++ show cube) fixRightWhiteSideBottom $ makeMoveAndNoteWhiteUp Front [D] cube
+fixFrontWhiteSideDown :: CubeWithMoves -> CubeWithMoves
+fixFrontWhiteSideDown cube
+  | down !! 1 == Red = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Front [D', L', F, L] cube
+  | otherwise = trace ("DEBUG" ++ show cube) fixRightWhiteSideDown $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)
 
-fixRightWhiteSideBottom :: (Cube, [Move]) -> (Cube, [Move])
-fixRightWhiteSideBottom cube
-  | getSide Down (fst cube) !! 5 == getTargetSideColor Right = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Right [D', L', F, L] cube
-  | otherwise = trace ("DEBUG fixRightWhiteSideBottom" ++ show (getSide Down (fst cube) !! 5) ++ show cube) $ fixBackWhiteSideBottom $ makeMoveAndNoteWhiteUp Front [D] cube
+fixRightWhiteSideDown :: CubeWithMoves -> CubeWithMoves
+fixRightWhiteSideDown cube
+  | down !! 5 == Blue = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Right [D', L', F, L] cube
+  | otherwise = trace ("DEBUG" ++ show cube) $ fixBackWhiteSideDown $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)
 
-fixBackWhiteSideBottom :: (Cube, [Move]) -> (Cube, [Move])
-fixBackWhiteSideBottom cube
-  | getSide Down (fst cube) !! 7 == getTargetSideColor Back = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Back [D', L', F, L] cube
-  | otherwise = trace ("DEBUG fixBackWhiteSideBottom" ++ show cube) $ fixLeftWhiteSideBottom $ makeMoveAndNoteWhiteUp Front [D] cube
+fixBackWhiteSideDown :: CubeWithMoves -> CubeWithMoves
+fixBackWhiteSideDown cube
+  | down !! 7 == Orange = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Back [D', L', F, L] cube
+  | otherwise = trace ("DEBUG" ++ show cube) $ fixLeftWhiteSideDown $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)
 
-fixLeftWhiteSideBottom :: (Cube, [Move]) -> (Cube, [Move])
-fixLeftWhiteSideBottom cube
-  | getSide Down (fst cube) !! 3 == getTargetSideColor Left = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Left [D', L', F, L] cube
-  | otherwise = trace ("DEBUG fixLeftWhiteSideBottom" ++ show cube) $ fixFrontWhiteSideBottom $ makeMoveAndNoteWhiteUp Front [D] cube
+fixLeftWhiteSideDown :: CubeWithMoves -> CubeWithMoves
+fixLeftWhiteSideDown cube
+  | down !! 3 == Green = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Left [D', L', F, L] cube
+  | otherwise = trace ("DEBUG" ++ show cube) $ fixFrontWhiteSideDown $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)
 
-fixFrontWhiteDown :: (Cube, [Move]) -> (Cube, [Move])
+fixFrontWhiteDown :: CubeWithMoves -> CubeWithMoves
 fixFrontWhiteDown cube
-  | getSide Front (fst cube) !! 7 == getTargetSideColor Front = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Front [F, F] cube
+  | front !! 7 == Red = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Front [F, F] cube
   | otherwise = trace ("DEBUG" ++ show cube) $ fixRightWhiteDown $ makeMoveAndNoteWhiteUp Front [D] cube
+  where front = getSide Front (fst cube)
 
-fixRightWhiteDown :: (Cube, [Move]) -> (Cube, [Move])
+fixRightWhiteDown :: CubeWithMoves -> CubeWithMoves
 fixRightWhiteDown cube
-  | getSide Right (fst cube) !! 7 == getTargetSideColor Right = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Right [F, F] cube
+  | right !! 7 == Blue = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Right [F, F] cube
   | otherwise = trace ("DEBUG" ++ show cube) $ fixBackWhiteDown $ makeMoveAndNoteWhiteUp Front [D] cube
+  where right = getSide Right (fst cube)
 
-fixBackWhiteDown :: (Cube, [Move]) -> (Cube, [Move])
+fixBackWhiteDown :: CubeWithMoves -> CubeWithMoves
 fixBackWhiteDown cube
-  | getSide Back (fst cube) !! 7 == getTargetSideColor Back = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Back [F, F] cube
+  | back !! 7 == Orange = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Back [F, F] cube
   | otherwise = trace ("DEBUG" ++ show cube) $ fixLeftWhiteDown $ makeMoveAndNoteWhiteUp Front [D] cube
+  where back = getSide Back (fst cube)
 
-fixLeftWhiteDown :: (Cube, [Move]) -> (Cube, [Move])
+fixLeftWhiteDown :: CubeWithMoves -> CubeWithMoves
 fixLeftWhiteDown cube
-  | getSide Left (fst cube) !! 7 == getTargetSideColor Left = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Left [F, F] cube
+  | left !! 7 == Green = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Left [F, F] cube
   | otherwise = trace ("DEBUG" ++ show cube) $ fixFrontWhiteDown $ makeMoveAndNoteWhiteUp Front [D] cube
+  where left = getSide Left (fst cube)
+
+{-- Phase 2
+solve white corners --}
+
+solveWhiteCorners :: CubeWithMoves -> CubeWithMoves
+solveWhiteCorners cube = if checkWhiteCornersAndSides cube then cube else fixUpWhiteEdges cube
+
+checkWhiteCornersAndSides :: CubeWithMoves -> Bool
+checkWhiteCornersAndSides cube = checkWhiteUp cube 
+  && checkSide Front front 
+  && checkSide Right right 
+  && checkSide Left left 
+  && checkSide Back back
+  where
+    (front, left, back, right, up, down) = getSides (fst cube)
+    checkSide side colors = colors !! 0 == getTargetSideColor side && colors !! 2 == getTargetSideColor side
+
+checkWhiteUp :: CubeWithMoves -> Bool
+checkWhiteUp (cube, moves) = up !! 0 == White && up !! 2 == White && up !! 6 == White && up !! 8 == White
+  where up = getSide Up cube
+
+fixUpWhiteEdges :: CubeWithMoves -> CubeWithMoves
+fixUpWhiteEdges cube = fixBackUpEdges $ fixLeftUpEdges $ fixRightUpEdges $ fixFrontUpEdges $ takeDownWrongEdges cube
+
+takeDownWrongEdges :: CubeWithMoves -> CubeWithMoves
+takeDownWrongEdges cube
+  | up !! 6 == White && (front !! 0 /= Red || left !! 2 /= Green) = trace ("DEBUG" ++ show cube) $ takeDownWrongEdges $ makeMoveAndNoteWhiteUp Front [L, D, L'] cube
+  | up !! 8 == White && (front !! 2 /= Red || right !! 0 /= Blue) = trace ("DEBUG" ++ show cube) $ takeDownWrongEdges $ makeMoveAndNoteWhiteUp Right [L, D, L'] cube
+  | up !! 0 == White && (back !! 0 /= Orange || left !! 0 /= Green) = trace ("DEBUG" ++ show cube) $ takeDownWrongEdges $ makeMoveAndNoteWhiteUp Left [L, D, L'] cube
+  | up !! 2 == White && (right !! 2 /= Blue || back !! 0 /= Orange) = trace ("DEBUG" ++ show cube) $ takeDownWrongEdges $ makeMoveAndNoteWhiteUp Back [L, D, L'] cube
+  | otherwise = cube
+  where
+  (front, left, back, right, up, down) = getSides (fst cube)  
+
+fixFrontUpEdges :: CubeWithMoves -> CubeWithMoves
+fixFrontUpEdges cube
+  | front !! 0 == White = trace ("DEBUG" ++ show cube) $ fixFrontUpEdges $ fixFrontLeftDownEdge $ makeMoveAndNoteWhiteUp Front [F', D', F, D] cube
+  | front !! 2 == White = trace ("DEBUG" ++ show cube) $ fixFrontUpEdges $ fixFrontRightDownEdge $ makeMoveAndNoteWhiteUp Front [F, D, F', D'] cube
+  | front !! 6 == White = trace ("DEBUG" ++ show cube) $ fixFrontUpEdges $ fixFrontLeftDownEdge cube
+  | front !! 8 == White = trace ("DEBUG" ++ show cube) $ fixFrontUpEdges $ fixFrontRightDownEdge cube
+  | down !! 0 == White  = trace ("DEBUG" ++ show cube) $ fixFrontUpEdges $ moveFromDownToSideFront cube
+  | down !! 2 == White  = trace ("DEBUG" ++ show cube) $ fixFrontUpEdges $ makeMoveAndNoteWhiteUp Front [D'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) cube
+  where
+    front = getSide Front (fst cube)
+    down = down
+
+fixRightUpEdges :: CubeWithMoves -> CubeWithMoves
+fixRightUpEdges cube
+  | right !! 0 == White = trace ("DEBUG" ++ show cube) $ fixRightUpEdges $ fixRightLeftDownEdge $ makeMoveAndNoteWhiteUp Right [F', D', F, D] cube
+  | right !! 2 == White = trace ("DEBUG" ++ show cube) $ fixRightUpEdges $ fixRightRightDownEdge $ makeMoveAndNoteWhiteUp Right [F, D, F', D'] cube
+  | right !! 6 == White = trace ("DEBUG" ++ show cube) $ fixRightUpEdges $ fixRightLeftDownEdge cube
+  | right !! 8 == White = trace ("DEBUG" ++ show cube) $ fixRightUpEdges $ fixRightRightDownEdge cube
+  | down !! 0 == White  = trace ("DEBUG" ++ show cube) $ fixRightUpEdges $ moveFromDownToSideRight cube
+  | down !! 2 == White  = trace ("DEBUG" ++ show cube) $ fixRightUpEdges $ makeMoveAndNoteWhiteUp Right [D'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) cube
+  where
+    right = getSide Right (fst cube)
+    down = down
+
+fixLeftUpEdges :: CubeWithMoves -> CubeWithMoves
+fixLeftUpEdges cube
+  | left !! 0 == White = trace ("DEBUG" ++ show cube) $ fixLeftUpEdges $ fixLeftLeftDownEdge $ makeMoveAndNoteWhiteUp Left [F', D', F, D] cube
+  | left !! 2 == White = trace ("DEBUG" ++ show cube) $ fixLeftUpEdges $ fixLeftRightDownEdge $ makeMoveAndNoteWhiteUp Left [F, D, F', D'] cube
+  | left !! 6 == White = trace ("DEBUG" ++ show cube) $ fixLeftUpEdges $ fixLeftLeftDownEdge cube
+  | left !! 8 == White = trace ("DEBUG" ++ show cube) $ fixLeftUpEdges $ fixLeftRightDownEdge cube
+  | down !! 0 == White = trace ("DEBUG" ++ show cube) $ fixLeftUpEdges $ moveFromDownToSideLeft cube
+  | down !! 2 == White = trace ("DEBUG" ++ show cube) $ fixLeftUpEdges $ makeMoveAndNoteWhiteUp Left [D'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) cube
+  where
+    left = getSide Left (fst cube)
+    down = down
+
+fixBackUpEdges :: CubeWithMoves -> CubeWithMoves
+fixBackUpEdges cube
+  | back !! 0 == White = trace ("DEBUG" ++ show cube) $ fixBackUpEdges $ fixBackLeftDownEdge $ makeMoveAndNoteWhiteUp Back [F', D', F, D] cube
+  | back !! 2 == White = trace ("DEBUG" ++ show cube) $ fixBackUpEdges $ fixBackRightDownEdge $ makeMoveAndNoteWhiteUp Back [F, D, F', D'] cube
+  | back !! 6 == White = trace ("DEBUG" ++ show cube) $ fixBackUpEdges $ fixBackLeftDownEdge cube
+  | back !! 8 == White = trace ("DEBUG" ++ show cube) $ fixBackUpEdges $ fixBackRightDownEdge cube
+  | down !! 0 == White = trace ("DEBUG" ++ show cube) $ fixBackUpEdges $ moveFromDownToSideBack cube
+  | down !! 2 == White = trace ("DEBUG" ++ show cube) $ fixBackUpEdges $ makeMoveAndNoteWhiteUp Back [D'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) cube
+  where
+    back = getSide Back (fst cube)
+    down = down
+
+moveFromDownToSideFront :: CubeWithMoves -> CubeWithMoves
+moveFromDownToSideFront cube
+  | left !! 8 /= Green && front !! 6 /= Red = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Front [D, L, D', L'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) moveFromDownToSideRight $ makeMoveAndNoteWhiteUp Front [D] cube
+  where 
+    front = getSide Front (fst cube)
+    left  = getSide Left (fst cube)
+  
+moveFromDownToSideRight :: CubeWithMoves -> CubeWithMoves
+moveFromDownToSideRight cube
+  | front !! 8 /= Red && right !! 6 /= Blue = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Right [D, L, D', L'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) moveFromDownToSideBack $ makeMoveAndNoteWhiteUp Front [D] cube
+  where 
+    front = getSide Front (fst cube)
+    right = getSide Right (fst cube)
+  
+moveFromDownToSideBack :: CubeWithMoves -> CubeWithMoves
+moveFromDownToSideBack cube
+  | right !! 8 /= Blue && back !! 6 /= Orange = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Front [D, L, D', L'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) moveFromDownToSideLeft $ makeMoveAndNoteWhiteUp Front [D] cube
+  where 
+    right = getSide Right (fst cube)
+    back  = getSide Back (fst cube)
+
+moveFromDownToSideLeft :: CubeWithMoves -> CubeWithMoves
+moveFromDownToSideLeft cube
+  | back !! 8 /= Orange && left !! 6 /= Green = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Front [D, L, D', L'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) moveFromDownToSideFront $ makeMoveAndNoteWhiteUp Front [D] cube
+  where 
+    back = getSide Back (fst cube)
+    left = getSide Left (fst cube)
+
+fixFrontLeftDownEdge :: CubeWithMoves -> CubeWithMoves
+fixFrontLeftDownEdge cube
+  | down !! 0 == Red = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Front [D, L, D', L'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) fixRightLeftDownEdge $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)
+
+fixRightLeftDownEdge :: CubeWithMoves -> CubeWithMoves
+fixRightLeftDownEdge cube
+  | down !! 2 == Blue = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Right [D, L, D', L'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) fixBackLeftDownEdge $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)
+
+fixBackLeftDownEdge :: CubeWithMoves -> CubeWithMoves
+fixBackLeftDownEdge cube
+  | down !! 8 == Orange = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Back [D, L, D', L'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) fixLeftLeftDownEdge $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)
+
+fixLeftLeftDownEdge :: CubeWithMoves -> CubeWithMoves
+fixLeftLeftDownEdge cube
+  | down !! 6 == Green = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Left [D, L, D', L'] cube
+  | otherwise = trace ("DEBUG" ++ show cube) fixFrontLeftDownEdge $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)
+
+fixFrontRightDownEdge :: CubeWithMoves -> CubeWithMoves
+fixFrontRightDownEdge cube
+  | down !! 2 == Red = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Front [D', R', D, R] cube
+  | otherwise = trace ("DEBUG" ++ show cube) fixRightRightDownEdge $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)
+
+fixRightRightDownEdge :: CubeWithMoves -> CubeWithMoves
+fixRightRightDownEdge cube
+  | down !! 8 == Blue = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Right [D', R', D, R] cube
+  | otherwise = trace ("DEBUG" ++ show cube) fixBackRightDownEdge $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)
+
+fixBackRightDownEdge :: CubeWithMoves -> CubeWithMoves
+fixBackRightDownEdge cube
+  | down !! 6 == Orange = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Back [D', R', D, R] cube
+  | otherwise = trace ("DEBUG" ++ show cube) fixLeftRightDownEdge $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)
+
+fixLeftRightDownEdge :: CubeWithMoves -> CubeWithMoves
+fixLeftRightDownEdge cube
+  | down !! 0 == Green = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Left [D', R', D, R] cube
+  | otherwise = trace ("DEBUG" ++ show cube) fixFrontRightDownEdge $ makeMoveAndNoteWhiteUp Front [D] cube
+  where down = getSide Down (fst cube)

@@ -17,4 +17,4 @@ randomCube =
   ]
 
 main :: IO ()
-main = print (snd (solveWhiteCross (moveDown $ moveUp $ moveLeft $ moveRight $ moveRight getSolvedCube, [])))
+main = print (solveCube $ moveDown $ moveUp $ moveLeft $ moveRight $ moveRight getSolvedCube)
