@@ -50,7 +50,7 @@ translateMoveWhiteUp Right move
   | move == R' = B'
   | move == F = R
   | move == F' = R'
-  | move == B = L'
+  | move == B = L
   | move == B' = L'
   | otherwise = move
 translateMoveWhiteUp Left move
@@ -60,7 +60,7 @@ translateMoveWhiteUp Left move
   | move == R' = F'
   | move == F = L
   | move == F' = L'
-  | move == B = R'
+  | move == B = R
   | move == B' = R'
   | otherwise = move
 translateMoveWhiteUp Back move
@@ -70,7 +70,7 @@ translateMoveWhiteUp Back move
   | move == R' = L'
   | move == F = B
   | move == F' = B'
-  | move == B = F'
+  | move == B = F
   | move == B' = F'
   | otherwise = move
 
@@ -98,7 +98,7 @@ translateMoveWhiteDown Right move
   | move == R' = B'
   | move == F = L
   | move == F' = L'
-  | move == B = R'
+  | move == B = R
   | move == B' = R'
   | otherwise = move
 translateMoveWhiteDown Left move
@@ -112,7 +112,7 @@ translateMoveWhiteDown Left move
   | move == R' = F'
   | move == F = R
   | move == F' = R'
-  | move == B = L'
+  | move == B = L
   | move == B' = L'
   | otherwise = move
 translateMoveWhiteDown Back move
@@ -122,7 +122,7 @@ translateMoveWhiteDown Back move
   | move == D' = U'
   | move == F = B
   | move == F' = B'
-  | move == B = F'
+  | move == B = F
   | move == B' = F'
   | otherwise = move
 
