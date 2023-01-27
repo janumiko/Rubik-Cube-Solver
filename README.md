@@ -2,7 +2,7 @@
 
 ### Usage
 
-Compile haskell
+Compile files with haskell compiler.
 
 ```
 ghc Main.hs
