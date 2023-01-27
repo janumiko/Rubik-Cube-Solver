@@ -191,13 +191,13 @@ testBack' =
            Cube
        )
 
-debugCube = [
-  (Front, [Red, Red, Yellow, Red, Red, Yellow, Blue, Blue, Red]), 
-  (Right, [Blue, Blue, White, Blue, Blue, White, White, White, White]), 
-  (Back, [Orange, Orange, Orange, Orange, Orange, Orange, Orange, Green, Green]), 
-  (Left, [Yellow, Green, Green, Yellow, Green, Green, Red, Red, Yellow]), 
-  (Up, [Green, Green, Green, White, White, Red, White, White, Red]), 
-  (Down, [Blue, Yellow, Yellow, Blue, Yellow, Yellow, Blue, Orange, Orange])
+debugCube =
+  [ (Front, [Red, Red, Yellow, Red, Red, Yellow, Blue, Blue, Red]),
+    (Right, [Blue, Blue, White, Blue, Blue, White, White, White, White]),
+    (Back, [Orange, Orange, Orange, Orange, Orange, Orange, Orange, Green, Green]),
+    (Left, [Yellow, Green, Green, Yellow, Green, Green, Red, Red, Yellow]),
+    (Up, [Green, Green, Green, White, White, Red, White, White, Red]),
+    (Down, [Blue, Yellow, Yellow, Blue, Yellow, Yellow, Blue, Orange, Orange])
   ]
 
 testSolveCompletes :: Cube -> Bool
@@ -224,17 +224,32 @@ testAll =
     && testBackBack
     && testMakeMoves
 
+testSolveCompletesAll :: Bool
+testSolveCompletesAll =
+  testSolveCompletes getSolvedCube
+    && testSolveCompletes (moveLeft getSolvedCube)
+    && testSolveCompletes (moveLeft (moveBack' (moveDown (moveUp' (moveRight (moveLeft getSolvedCube))))))
+    && testSolveCompletes (moveLeft' (moveRight (moveUp' (moveDown' (moveLeft (moveBack' (moveDown (moveUp' (moveRight (moveLeft getSolvedCube))))))))))
+    && testSolveCompletes (moveLeft' (moveRight (moveUp' (moveDown' (moveLeft (moveBack' (moveDown (moveUp' (moveRight (moveLeft getSolvedCube))))))))))
+    && testSolveCompletes (makeMoves [F, D, D, U, L', R, R, L, D, D, U', B, B, L, R', D', U', L, D, U', B', R, D, U] getSolvedCube)
+    && testSolveCompletes (makeMoves [D, D, R, L', B, F, F, R, L, F, B', F, D, D, U, L', R, R, L, D, D, U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', D', U', L, D, U', B', R, D, U] getSolvedCube)
+    && testSolveCompletes (makeMoves [R, L, D, F, D, D, U, L', R, D, F, D, D, U, L', R, R, L, D, D, U', R, L, F, B', D', U', L, D, U', B', R, D, U, L, D, U', B', R, D, U] getSolvedCube)
+    && testSolveCompletes (makeMoves [D, U', B, B, F, D, D, U, L', R, R, L, D, L, R', D, D, R, L', B, F, F, R, L, F, B', D, D, U, L', R, R, L, D, D, D', U', L, D, U', B', R, D, U] getSolvedCube)
+    && testSolveCompletes (makeMoves [R, L, D, F, D, D, U, L', R, R, L, D, D, U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', B, B, L, R', D, D, R, L', B, F, F, D', U', L, D, U', B', R, D, U] getSolvedCube)
+    && testSolveCompletes (makeMoves [F, U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', D', U'] getSolvedCube)
+    && testSolveCompletes (makeMoves [U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', D', U', L, D, U', B', R, D, U] getSolvedCube)
+
 testE2E :: Bool
-testE2E = 
-  testSolveCompletes getSolvedCube 
-  && testSolveCompletes (moveLeft getSolvedCube) 
-  && testSolveCompletes (moveLeft (moveBack' (moveDown (moveUp' (moveRight (moveLeft getSolvedCube))))))
-  && testSolveCompletes (moveLeft' (moveRight (moveUp' (moveDown' (moveLeft (moveBack' (moveDown (moveUp' (moveRight (moveLeft getSolvedCube))))))))))
-  && testSolveCompletes (moveLeft' (moveRight (moveUp' (moveDown' (moveLeft (moveBack' (moveDown (moveUp' (moveRight (moveLeft getSolvedCube))))))))))
-  && testSolveCompletes (makeMoves [F,D,D,U,L',R,R,L,D,D,U',B,B,L,R',D',U',L,D,U',B',R,D,U] getSolvedCube)
-  && testSolveCompletes (makeMoves [D,D,R,L',B,F,F,R,L,F,B',F,D,D,U,L',R,R,L,D,D,U',B,B,L,R',D,D,R,L',B,F,F,R,L,F,B',D',U',L,D,U',B',R,D,U] getSolvedCube)
-  && testSolveCompletes (makeMoves [R,L,D,F,D,D,U,L',R,D,F,D,D,U,L',R,R,L,D,D,U',R,L,F,B',D',U',L,D,U',B',R,D,U,L,D,U',B',R,D,U] getSolvedCube)
-  && testSolveCompletes (makeMoves [D,U',B,B,F,D,D,U,L',R,R,L,D,L,R',D,D,R,L',B,F,F,R,L,F,B',D,D,U,L',R,R,L,D,D,D',U',L,D,U',B',R,D,U] getSolvedCube)
-  && testSolveCompletes (makeMoves [R,L,D,F,D,D,U,L',R,R,L,D,D,U',B,B,L,R',D,D,R,L',B,F,F,R,L,F,B',B,B,L,R',D,D,R,L',B,F,F,D',U',L,D,U',B',R,D,U] getSolvedCube)
-  && testSolveCompletes (makeMoves [F,U',B,B,L,R',D,D,R,L',B,F,F,R,L,F,B',D',U'] getSolvedCube)
-  && testSolveCompletes (makeMoves [U',B,B,L,R',D,D,R,L',B,F,F,R,L,F,B',D',U',L,D,U',B',R,D,U] getSolvedCube)
+testE2E =
+  fst (solveCube getSolvedCube) == getSolvedCube
+    && fst (solveCube (moveLeft getSolvedCube)) == getSolvedCube
+    && fst (solveCube (moveLeft (moveBack' (moveDown (moveUp' (moveRight (moveLeft getSolvedCube))))))) == getSolvedCube
+    && fst (solveCube (moveLeft' (moveRight (moveUp' (moveDown' (moveLeft (moveBack' (moveDown (moveUp' (moveRight (moveLeft getSolvedCube))))))))))) == getSolvedCube
+    && fst (solveCube (moveLeft' (moveRight (moveUp' (moveDown' (moveLeft (moveBack' (moveDown (moveUp' (moveRight (moveLeft getSolvedCube))))))))))) == getSolvedCube
+    && fst (solveCube (makeMoves [F, D, D, U, L', R, R, L, D, D, U', B, B, L, R', D', U', L, D, U', B', R, D, U] getSolvedCube)) == getSolvedCube
+    && fst (solveCube (makeMoves [D, D, R, L', B, F, F, R, L, F, B', F, D, D, U, L', R, R, L, D, D, U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', D', U', L, D, U', B', R, D, U] getSolvedCube)) == getSolvedCube
+    && fst (solveCube (makeMoves [R, L, D, F, D, D, U, L', R, D, F, D, D, U, L', R, R, L, D, D, U', R, L, F, B', D', U', L, D, U', B', R, D, U, L, D, U', B', R, D, U] getSolvedCube)) == getSolvedCube
+    && fst (solveCube (makeMoves [D, U', B, B, F, D, D, U, L', R, R, L, D, L, R', D, D, R, L', B, F, F, R, L, F, B', D, D, U, L', R, R, L, D, D, D', U', L, D, U', B', R, D, U] getSolvedCube)) == getSolvedCube
+    && fst (solveCube (makeMoves [R, L, D, F, D, D, U, L', R, R, L, D, D, U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', B, B, L, R', D, D, R, L', B, F, F, D', U', L, D, U', B', R, D, U] getSolvedCube)) == getSolvedCube
+    && fst (solveCube (makeMoves [F, U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', D', U'] getSolvedCube)) == getSolvedCube
+    && fst (solveCube (makeMoves [U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', D', U', L, D, U', B', R, D, U] getSolvedCube)) == getSolvedCube

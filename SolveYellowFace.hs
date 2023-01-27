@@ -14,7 +14,7 @@ import Prelude hiding (Left, Right)
 solve Yellow face --}
 
 solveYellowFace :: CubeWithMoves -> CubeWithMoves
-solveYellowFace cube = positionYellowCorners $ solveYellowCorners $ solveYellowCross cube
+solveYellowFace cube = positionYellowEdges $ positionYellowCorners $ solveYellowCorners $ solveYellowCross cube
 
 {-- Phase 4.1
 solve white cross --}
@@ -117,3 +117,42 @@ isTwoCorrectCorners cube =
        )
   where
     (front, left, back, right, up, down) = getSides (fst cube)
+
+{-- Phase 4.4
+Position yellow edges --}
+
+positionYellowEdges :: CubeWithMoves -> CubeWithMoves
+positionYellowEdges cube = if checkYellowEdges cube then cube else positionYellowEdges $ positionYellowEdges' cube
+
+checkYellowEdges :: CubeWithMoves -> Bool
+checkYellowEdges cube =
+  front !! 7 == Red
+    && left !! 7 == Green
+    && right !! 7 == Blue
+    && back !! 7 == Orange
+  where
+    (front, left, back, right, up, down) = getSides (fst cube)
+
+positionYellowEdges' :: CubeWithMoves -> CubeWithMoves
+positionYellowEdges' cube
+  | isSideSolved cube Front = makeMoveAndNoteWhiteDown Back [F, F, U, L, R', F, F, L', R, U, F, F] cube
+  | isSideSolved cube Right = makeMoveAndNoteWhiteDown Left [F, F, U, L, R', F, F, L', R, U, F, F] cube
+  | isSideSolved cube Back = makeMoveAndNoteWhiteDown Front [F, F, U, L, R', F, F, L', R, U, F, F] cube
+  | isSideSolved cube Left = makeMoveAndNoteWhiteDown Right [F, F, U, L, R', F, F, L', R, U, F, F] cube
+  | otherwise = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteDown Front [F, F, U, L, R', F, F, L', R, U, F, F] cube
+  where
+    (front, left, back, right, up, down) = getSides (fst cube)
+
+isSideSolved :: CubeWithMoves -> Side -> Bool
+isSideSolved cube side =
+  colors !! 0 == targetColor
+    && colors !! 1 == targetColor
+    && colors !! 2 == targetColor
+    && colors !! 3 == targetColor
+    && colors !! 5 == targetColor
+    && colors !! 6 == targetColor
+    && colors !! 7 == targetColor
+    && colors !! 8 == targetColor
+  where
+    colors = getSide side (fst cube)
+    targetColor = getTargetSideColor side
