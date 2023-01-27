@@ -1,6 +1,0 @@
-Down Red Red White White Yellow Yellow Blue Yellow White
-Up Orange Yellow Yellow Orange White Blue Red White Yellow
-Left Green White Blue Red Green Blue Red Green Green
-Right Green Orange Orange Green Blue Green Orange Red Orange
-Front White Blue Red Yellow Red Orange White Blue Green
-Back Blue Green Yellow Red Orange White Blue Orange Yellow

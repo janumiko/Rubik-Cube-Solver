@@ -14,7 +14,9 @@ main = do
   content <- readFile fileName
   let fileLines = lines content
   let cube = readCube fileLines []
-  print (snd $ solveCube (makeMoves [F, F, D', R', R, L, D, F, D, D, U, L', R, R, L, D, D, U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', B, B, L, R', D, D, R, L', B, F, F, D', U', L, D, U', B', R, D, U] cube))
+  let solved = solveCube cube
+  print (fst solved)
+  print (snd solved)
 
 main2 :: IO ()
 main2 = print (solveCube (makeMoves [R, L, D, F, D, D, U, L', R, R, L, D, D, U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', B, B, L, R', D, D, R, L', B, F, F, D', U', L, D, U', B', R, D, U] getSolvedCube))
