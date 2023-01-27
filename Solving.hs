@@ -3,7 +3,6 @@
 {-# HLINT ignore "Use head" #-}
 module Solving where
 
-import Debug.Trace
 import Rotations
 import SolveMidlayer
 import SolveWhiteCorners

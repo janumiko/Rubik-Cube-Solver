@@ -4,7 +4,6 @@
 
 module SolveYellowFace where
 
-import Debug.Trace
 import Rotations
 import Types
 import Utils
@@ -51,10 +50,10 @@ solveYellowCorners cube = if checkYellowFace cube then cube else solveYellowCorn
 
 fixYellowCorners :: CubeWithMoves -> CubeWithMoves
 fixYellowCorners cube
-  | down !! 2 == Yellow && (countYellowCorners cube == 1) = trace ("DEBUG" ++ show cube ++ "\n" ++ show (countYellowCorners cube)) $ makeMoveAndNoteWhiteDown Front [R, U, R', U, R, U, U, R'] cube
-  | right !! 6 == Yellow && (countYellowCorners cube == 0) = trace ("DEBUG" ++ show cube ++ "\n" ++ show (countYellowCorners cube)) $ makeMoveAndNoteWhiteDown Front [R, U, R', U, R, U, U, R'] cube
-  | front !! 8 == Yellow && (countYellowCorners cube == 2) = trace ("DEBUG" ++ show cube ++ "\n" ++ show (countYellowCorners cube)) $ makeMoveAndNoteWhiteDown Front [R, U, R', U, R, U, U, R'] cube
-  | otherwise = trace ("DEBUG" ++ show cube ++ "\n" ++ show (countYellowCorners cube) ++ "\n" ++ show (up !! 6)) $ makeMoveAndNoteWhiteUp Front [D] cube
+  | down !! 2 == Yellow && (countYellowCorners cube == 1) = makeMoveAndNoteWhiteDown Front [R, U, R', U, R, U, U, R'] cube
+  | right !! 6 == Yellow && (countYellowCorners cube == 0) = makeMoveAndNoteWhiteDown Front [R, U, R', U, R, U, U, R'] cube
+  | front !! 8 == Yellow && (countYellowCorners cube == 2) = makeMoveAndNoteWhiteDown Front [R, U, R', U, R, U, U, R'] cube
+  | otherwise = makeMoveAndNoteWhiteUp Front [D] cube
   where
     (front, left, back, right, up, down) = getSides (fst cube)
 
@@ -101,7 +100,7 @@ positionYellowCorners' cube
   | right !! 6 == Blue && right !! 8 == Blue = makeMoveAndNoteWhiteDown Left [R', F, R', B, B, R, F', R', B, B, R, R] cube
   | left !! 6 == Green && left !! 8 == Green = makeMoveAndNoteWhiteDown Right [R', F, R', B, B, R, F', R', B, B, R, R] cube
   | isTwoCorrectCorners cube = makeMoveAndNoteWhiteDown Front [R', F, R', B, B, R, F', R', B, B, R, R] cube
-  | otherwise = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Front [D] cube
+  | otherwise = makeMoveAndNoteWhiteUp Front [D] cube
   where
     (front, left, back, right, up, down) = getSides (fst cube)
 
@@ -139,7 +138,7 @@ positionYellowEdges' cube
   | isSideSolved cube Right = makeMoveAndNoteWhiteDown Left [F, F, U, L, R', F, F, L', R, U, F, F] cube
   | isSideSolved cube Back = makeMoveAndNoteWhiteDown Front [F, F, U, L, R', F, F, L', R, U, F, F] cube
   | isSideSolved cube Left = makeMoveAndNoteWhiteDown Right [F, F, U, L, R', F, F, L', R, U, F, F] cube
-  | otherwise = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteDown Front [F, F, U, L, R', F, F, L', R, U, F, F] cube
+  | otherwise = makeMoveAndNoteWhiteDown Front [F, F, U, L, R', F, F, L', R, U, F, F] cube
   where
     (front, left, back, right, up, down) = getSides (fst cube)
 

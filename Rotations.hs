@@ -6,21 +6,16 @@ module Rotations where
 import Types
 import Utils
 import Prelude hiding (Left, Right)
-import Debug.Trace
 
 makeMoveAndNoteWhiteUp :: Side -> [Move] -> CubeWithMoves -> CubeWithMoves
 makeMoveAndNoteWhiteUp side moves (cube, past_moves) =
-  trace
-    ("DEBUG" ++ show moves ++ show side)
-    (makeMoves translated_moves cube, past_moves ++ translated_moves)
+  (makeMoves translated_moves cube, past_moves ++ translated_moves)
   where
     translated_moves = translateMovesWhiteUp side moves
 
 makeMoveAndNoteWhiteDown :: Side -> [Move] -> CubeWithMoves -> CubeWithMoves
 makeMoveAndNoteWhiteDown side moves (cube, past_moves) =
-  trace
-    ("DEBUG" ++ show moves ++ show side)
-    (makeMoves translated_moves cube, past_moves ++ translated_moves)
+  (makeMoves translated_moves cube, past_moves ++ translated_moves)
   where
     translated_moves = translateMovesWhiteDown side moves
 
