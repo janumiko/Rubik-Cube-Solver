@@ -1,10 +1,11 @@
 module Main where
+
 import Rotations
 import Solving
+import System.Environment
 import Types
 import Utils
 import Prelude hiding (Left, Right)
-import System.Environment
 
 main :: IO ()
 main = do
@@ -13,15 +14,15 @@ main = do
   content <- readFile fileName
   let fileLines = lines content
   let cube = readCube fileLines []
-  print (solveCube (makeMoves [R,L,D,F,D,D,U,L',R,R,L,D,D,U',B,B,L,R',D,D,R,L',B,F,F,R,L,F,B',B,B,L,R',D,D,R,L',B,F,F,D',U',L,D,U',B',R,D,U] cube))
+  print (solveCube (makeMoves [R, L, D, F, D, D, U, L', R, R, L, D, D, U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', B, B, L, R', D, D, R, L', B, F, F, D', U', L, D, U', B', R, D, U] cube))
 
 readCube :: [String] -> Cube -> Cube
 readCube [] cube = cube
 readCube (x : xs) cube =
-  let w = words x in
-  let side = head w in
-  let currentCube = ((translateSide side, map translateColor (tail w)) :: Face) : cube in
-  readCube xs currentCube
+  let w = words x
+   in let side = head w
+       in let currentCube = ((translateSide side, map translateColor (tail w)) :: Face) : cube
+           in readCube xs currentCube
 
 translateSide :: String -> Side
 translateSide "Down" = Down

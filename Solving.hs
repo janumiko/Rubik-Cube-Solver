@@ -1,16 +1,17 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
 {-# HLINT ignore "Use head" #-}
 module Solving where
 
 import Debug.Trace
 import Rotations
+import SolveMidlayer
+import SolveWhiteCorners
+import SolveWhiteCross
+import SolveYellowFace
 import Types
 import Utils
 import Prelude hiding (Left, Right)
 
-import SolveMidlayer
-import SolveWhiteCorners
-import SolveWhiteCross
-
 solveCube :: Cube -> CubeWithMoves
-solveCube cube = solveMidLayer $ solveWhiteCorners $ solveWhiteCross (cube, [])
+solveCube cube = solveYellowCross $ solveMidLayer $ solveWhiteCorners $ solveWhiteCross (cube, [])
