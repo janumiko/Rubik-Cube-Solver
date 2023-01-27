@@ -14,7 +14,7 @@ import Prelude hiding (Left, Right)
 solve Yellow face --}
 
 solveYellowFace :: CubeWithMoves -> CubeWithMoves
-solveYellowFace cube = solveYellowCorners $ solveYellowCross cube
+solveYellowFace cube = positionYellowCorners $ solveYellowCorners $ solveYellowCross cube
 
 {-- Phase 4.1
 solve white cross --}
@@ -75,3 +75,45 @@ countYellowCorners :: CubeWithMoves -> Int
 countYellowCorners cube = foldl (\acc index -> if down !! index == Yellow then acc + 1 else acc) 0 [0, 2, 6, 8]
   where
     down = getSide Down (fst cube)
+
+{-- Phase 4.3
+position corners--}
+
+positionYellowCorners :: CubeWithMoves -> CubeWithMoves
+positionYellowCorners cube = if checkYellowCorners cube then cube else positionYellowCorners $ positionYellowCorners' cube
+
+checkYellowCorners :: CubeWithMoves -> Bool
+checkYellowCorners cube =
+  front !! 6 == Red && front !! 8 == Red
+    && left !! 6 == Green
+    && left !! 8 == Green
+    && right !! 6 == Blue
+    && right !! 8 == Blue
+    && back !! 6 == Orange
+    && back !! 8 == Orange
+  where
+    (front, left, back, right, up, down) = getSides (fst cube)
+
+positionYellowCorners' :: CubeWithMoves -> CubeWithMoves
+positionYellowCorners' cube
+  | back !! 6 == Orange && back !! 8 == Orange = makeMoveAndNoteWhiteDown Front [R', F, R', B, B, R, F', R', B, B, R, R] cube
+  | front !! 6 == Red && front !! 8 == Red = makeMoveAndNoteWhiteDown Back [R', F, R', B, B, R, F', R', B, B, R, R] cube
+  | right !! 6 == Blue && right !! 8 == Blue = makeMoveAndNoteWhiteDown Left [R', F, R', B, B, R, F', R', B, B, R, R] cube
+  | left !! 6 == Green && left !! 8 == Green = makeMoveAndNoteWhiteDown Right [R', F, R', B, B, R, F', R', B, B, R, R] cube
+  | isTwoCorrectCorners cube = makeMoveAndNoteWhiteDown Front [R', F, R', B, B, R, F', R', B, B, R, R] cube
+  | otherwise = trace ("DEBUG" ++ show cube) $ makeMoveAndNoteWhiteUp Front [D] cube
+  where
+    (front, left, back, right, up, down) = getSides (fst cube)
+
+isTwoCorrectCorners :: CubeWithMoves -> Bool
+isTwoCorrectCorners cube =
+  ( front !! 6 == Red && left !! 8 == Green
+      && back !! 6 == Orange
+      && right !! 8 == Blue
+  )
+    || ( front !! 8 == Red && right !! 6 == Blue
+           && back !! 8 == Orange
+           && left !! 6 == Green
+       )
+  where
+    (front, left, back, right, up, down) = getSides (fst cube)

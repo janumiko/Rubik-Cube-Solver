@@ -17,12 +17,12 @@ replace value n (x : xs) = if n == 0 then value : xs else x : replace value (n -
 
 getSolvedCube :: Cube
 getSolvedCube =
-  [ (Down, [Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow]),
-    (Up, [White, White, White, White, White, White, White, White, White]),
-    (Left, [Green, Green, Green, Green, Green, Green, Green, Green, Green]),
+  [ (Front, [Red, Red, Red, Red, Red, Red, Red, Red, Red]),
     (Right, [Blue, Blue, Blue, Blue, Blue, Blue, Blue, Blue, Blue]),
-    (Front, [Red, Red, Red, Red, Red, Red, Red, Red, Red]),
-    (Back, [Orange, Orange, Orange, Orange, Orange, Orange, Orange, Orange, Orange])
+    (Back, [Orange, Orange, Orange, Orange, Orange, Orange, Orange, Orange, Orange]),
+    (Left, [Green, Green, Green, Green, Green, Green, Green, Green, Green]),
+    (Up, [White, White, White, White, White, White, White, White, White]),
+    (Down, [Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow, Yellow])
   ]
 
 getTargetSideColor :: Side -> Color
