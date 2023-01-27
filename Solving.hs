@@ -14,4 +14,4 @@ import Utils
 import Prelude hiding (Left, Right)
 
 solveCube :: Cube -> CubeWithMoves
-solveCube cube = solveYellowCross $ solveMidLayer $ solveWhiteCorners $ solveWhiteCross (cube, [])
+solveCube cube = solveYellowFace $ solveMidLayer $ solveWhiteCorners $ solveWhiteCross (cube, [])

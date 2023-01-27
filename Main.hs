@@ -16,6 +16,9 @@ main = do
   let cube = readCube fileLines []
   print (solveCube (makeMoves [R, L, D, F, D, D, U, L', R, R, L, D, D, U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', B, B, L, R', D, D, R, L', B, F, F, D', U', L, D, U', B', R, D, U] cube))
 
+main2 :: IO ()
+main2 = print (solveCube (makeMoves [R, L, D, F, D, D, U, L', R, R, L, D, D, U', B, B, L, R', D, D, R, L', B, F, F, R, L, F, B', B, B, L, R', D, D, R, L', B, F, F, D', U', L, D, U', B', R, D, U] getSolvedCube))
+
 readCube :: [String] -> Cube -> Cube
 readCube [] cube = cube
 readCube (x : xs) cube =
